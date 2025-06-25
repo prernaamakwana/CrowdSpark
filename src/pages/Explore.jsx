@@ -1,44 +1,36 @@
-import { useState } from 'react';
-import CampaignCard from '../components/CampaignCard';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 export default function Explore() {
-  const allCampaigns = [
-    {
-      id: 1,
-      title: "Tech for Kids",
-      goal: 50000,
-      funded: 20000,
-      category: "Tech",
-    },
-    {
-      id: 2,
-      title: "Art Revival",
-      goal: 30000,
-      funded: 15000,
-      category: "Art",
-    },
-    {
-      id: 3,
-      title: "Clean Water for Villages",
-      goal: 40000,
-      funded: 12000,
-      category: "Social",
-    },
-  ];
-
+  const [campaigns, setCampaigns] = useState([]);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
   const [sort, setSort] = useState('Latest');
 
-  const filteredCampaigns = allCampaigns
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        const res = await axios.get('http://localhost:5000/api/campaigns');
+        setCampaigns(res.data);
+      } catch (err) {
+        console.error('Failed to fetch campaigns', err);
+      }
+    };
+    fetchCampaigns();
+  }, []);
+
+  const filteredCampaigns = campaigns
     .filter((c) =>
       c.title.toLowerCase().includes(search.toLowerCase()) &&
       (category === 'All' || c.category === category)
     )
     .sort((a, b) => {
       if (sort === 'Goal') return b.goal - a.goal;
-      if (sort === 'Funded') return b.funded - a.funded;
-      return b.id - a.id; // mock 'latest'
+      if (sort === 'Funded') return (b.funded || 0) - (a.funded || 0);
+      return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
   return (
@@ -78,8 +70,19 @@ export default function Explore() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredCampaigns.length > 0 ? (
-          filteredCampaigns.map((campaign) => (
-            <CampaignCard key={campaign.id} campaign={campaign} />
+          filteredCampaigns.map((c) => (
+            <div key={c._id} className="bg-white p-4 shadow rounded">
+              <h3 className="text-lg font-bold text-blue-900">{c.title}</h3>
+              <p className="mt-1">{c.description}</p>
+              <p className="text-sm text-gray-500 mt-2">Target: ₹{c.goal}</p>
+
+              <button
+                onClick={() => navigate(`/campaign/${c._id}`)}
+                className="mt-3 text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+              >
+                View Details
+              </button>
+            </div>
           ))
         ) : (
           <p className="text-center text-gray-600 col-span-full">

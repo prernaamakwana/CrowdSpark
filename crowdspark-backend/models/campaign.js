@@ -1,13 +1,11 @@
-const mongoose = require("mongoose");
+// models/Campaign.js
+const mongoose = require('mongoose');
 
-const CampaignSchema = new mongoose.Schema({
-  owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+const campaignSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  description: String,
+  description: { type: String },
   goal: { type: Number, required: true },
-  amountRaised: { type: Number, default: 0 },
-  image: String,
-  deadline: Date,
+  category: { type: String, required: true},  // 👈 MUST be in request
 }, { timestamps: true });
 
-module.exports = mongoose.model("Campaign", CampaignSchema);
+module.exports = mongoose.model('Campaign', campaignSchema);

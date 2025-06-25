@@ -1,45 +1,40 @@
-const Campaign = require("../models/campaign");
+const Campaign = require('../models/campaign');
 
-// Create a new campaign
 exports.createCampaign = async (req, res) => {
   try {
-    const { title, description, goal, deadline, image } = req.body;
+    const { title, description, goal, category } = req.body;
+    const userId = req.body.userId;
 
-    const newCampaign = new Campaign({
-      owner: req.user.id,
-      title,
-      description,
-      goal,
-      deadline,
-      image,
-    });
+    if (!title || !description || !goal || !category || !userId) {
+      return res.status(400).json({ message: 'Missing fields' });
+    }
 
-    const saved = await newCampaign.save();
-    res.status(201).json(saved);
+    const campaign = new Campaign({ title, description, goal, category, createdBy: userId });
+    await campaign.save();
+
+    res.status(201).json(campaign);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: "Server error while creating campaign" });
+    console.error('Create Campaign Error:', err);
+    res.status(500).json({ message: 'Failed to create campaign' });
   }
 };
 
-// Get all campaigns (public)
 exports.getAllCampaigns = async (req, res) => {
   try {
-    const campaigns = await Campaign.find().populate("owner", "name email");
+    const campaigns = await Campaign.find().sort({ createdAt: -1 });
     res.json(campaigns);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: "Error fetching campaigns" });
+    console.error('Fetch Campaigns Error:', err);
+    res.status(500).json({ message: 'Failed to fetch campaigns' });
   }
 };
 
-// Get campaigns created by current user
 exports.getUserCampaigns = async (req, res) => {
   try {
-    const campaigns = await Campaign.find({ owner: req.user.id });
+    const campaigns = await Campaign.find({ createdBy: req.params.userId });
     res.json(campaigns);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: "Error fetching user campaigns" });
+    console.error('Fetch My Campaigns Error:', err);
+    res.status(500).json({ message: 'Failed to fetch user campaigns' });
   }
 };

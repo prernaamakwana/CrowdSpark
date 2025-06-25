@@ -1,17 +1,29 @@
+require('dotenv').config();
 const express = require('express');
+const mongoose = require('mongoose');
 const cors = require('cors');
-const dotenv = require('dotenv');
-const connectDB = require('./config/db');
-
-dotenv.config();
-connectDB();
 
 const app = express();
+const commentRoutes = require('./routes/comments');
+const updateRoutes = require('./routes/updates');
+
+
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/campaigns', require('./routes/campaigns'));
+// Routes
+const authRoutes = require('./routes/auth');
+const campaignRoutes = require('./routes/campaigns');
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.use('/api/auth', authRoutes);
+app.use('/api/campaigns', campaignRoutes);
+app.use('/api/comments', commentRoutes);
+app.use('/api/updates', updateRoutes);
+
+
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log('Connected to MongoDB');
+    app.listen(5000, () => console.log('Server started on port 5000'));
+  })
+  .catch((err) => console.error('DB Connection Failed:', err));

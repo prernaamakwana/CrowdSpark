@@ -26,6 +26,8 @@ function App() {
         <Route path="/create" element={<CreateCampaign />} />
         <Route path="/campaign/:id" element={<CampaignDetail />} />
         <Route path="/landing" element={<Landing />} />
+        <Route path="/campaign/:id" element={<CampaignDetail />} />
+
  
       </Routes>
     </div>

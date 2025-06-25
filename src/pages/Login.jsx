@@ -1,14 +1,38 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // TODO: Call login API here
-    alert(`Logging in as ${email}`);
+    try {
+      const res = await axios.post(
+        'http://localhost:5000/api/auth/login',
+        { email, password },
+        { withCredentials: true } // ✅ allows cookie or session-based auth
+      );
+
+      if (res.data?.user) {
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+
+        // Optional: store token if backend sends it
+        if (res.data.token) {
+          localStorage.setItem('token', res.data.token);
+        }
+
+        alert('Login successful');
+        navigate('/dashboard');
+      } else {
+        alert('Login failed: Invalid response from server');
+      }
+    } catch (err) {
+      console.error("Login Error:", err);
+      alert('Login failed: ' + (err.response?.data?.message || 'Server error'));
+    }
   };
 
   return (
