@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const Comment = require('/models/Comment');
+const Comment = require('../models/Comment');
 
-// GET comments for a campaign
+
 router.get('/:campaignId', async (req, res) => {
   try {
     const comments = await Comment.find({ campaignId: req.params.campaignId });
@@ -12,7 +12,7 @@ router.get('/:campaignId', async (req, res) => {
   }
 });
 
-// POST a comment to a campaign
+
 router.post('/:campaignId', async (req, res) => {
   try {
     const { text, author } = req.body;

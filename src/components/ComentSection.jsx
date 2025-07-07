@@ -4,8 +4,7 @@ import axios from 'axios';
 export default function CommentsSection({ campaignId }) {
   const [comments, setComments] = useState([]);
   const [text, setText] = useState('');
-  const [user, setUser] = useState('Anonymous'); // Replace with actual logged-in user if available
-
+  const [user, setUser] = useState('Anonymous'); 
   const fetchComments = async () => {
     try {
       const res = await axios.get(`http://localhost:5000/api/comments/${campaignId}`);
@@ -21,13 +20,13 @@ const handleCommentSubmit = async (e) => {
   try {
     const res = await axios.post(`http://localhost:5000/api/comments/${id}`, {
       text: commentText,
-      author: 'Guest', // or replace with real user
+      author: 'Guest', 
     });
 
     setComments([...comments, res.data]);
     setCommentText('');
   } catch (err) {
-    console.error('Failed to post comment', err); // check browser console
+    console.error('Failed to post comment', err); 
     alert('Comment post failed');
   }
 };

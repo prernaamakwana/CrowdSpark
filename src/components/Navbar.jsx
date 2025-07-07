@@ -8,7 +8,6 @@ import {
 } from "react-icons/fa";
 
 const navItems = [
-  // { to: "/", icon: <FaHome />, label: "Home" },
   { to: "/explore", icon: <FaCompass />, label: "Explore" },
   { to: "/create", icon: <FaPlusCircle />, label: "Create" },
   { to: "/dashboard", icon: <FaUser />, label: "Dashboard" },
@@ -18,17 +17,11 @@ const navItems = [
 export default function Navbar() {
   return (
     <nav className="bg-accent p-4 shadow-md flex justify-between items-center">
-      {/* App Logo & Name */}
       <div className="text-blue-900 font-bold text-xl flex items-center space-x-2">
-        {/* <img
-          src="/logo.png" 
-          alt="logo"
-          className="w-8 h-8"
-        /> */}
+        
         <span>CrowdSpark 💡</span>
       </div>
 
-      {/* Right side icons */}
       <div className="flex items-center space-x-6">
         {navItems.map((item, index) => (
           <Link

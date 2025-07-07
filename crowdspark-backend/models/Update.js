@@ -8,12 +8,11 @@ const updateSchema = new mongoose.Schema({
   },
   title: {
     type: String,
-    default: '', // Optional title for the update
+    default: '', 
   },
   message: {
     type: String,
     required: true,
   }
-}, { timestamps: true }); // Adds createdAt & updatedAt
-
+}, { timestamps: true }); 
 module.exports = mongoose.model('Update', updateSchema);

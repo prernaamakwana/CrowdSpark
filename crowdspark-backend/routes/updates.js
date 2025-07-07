@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const Update = require('../models/update');
 
-// Create a new update for a campaign
 router.post('/:campaignId', async (req, res) => {
   const { campaignId } = req.params;
   const { title, message } = req.body;
@@ -21,7 +20,6 @@ router.post('/:campaignId', async (req, res) => {
   }
 });
 
-// Get all updates for a campaign
 router.get('/:campaignId', async (req, res) => {
   const { campaignId } = req.params;
 

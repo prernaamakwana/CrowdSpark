@@ -8,7 +8,7 @@ const commentSchema = new mongoose.Schema(
       required: true,
     },
     user: {
-      type: String, // If you implement auth later, you can change this to userId
+      type: String, 
       required: true,
       default: 'Guest',
     },
@@ -19,7 +19,7 @@ const commentSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // adds createdAt and updatedAt
+    timestamps: true, 
   }
 );
 

@@ -51,7 +51,7 @@ export default function CampaignDetail() {
     try {
       const res = await axios.post(`http://localhost:5000/api/comments/${id}`, {
         text: commentText,
-        author: 'Guest', // Replace with logged-in user in future
+        author: 'Guest', 
       });
 
       setComments([...comments, res.data]);
@@ -89,7 +89,6 @@ export default function CampaignDetail() {
       <p className="text-gray-600 mb-2">{campaign.description}</p>
       <p className="text-gray-800 mb-4">Goal: ₹{campaign.goal}</p>
 
-      {/* 📤 Share Buttons */}
       <div className="mt-4 mb-6 flex items-center gap-4">
         <span className="font-semibold text-gray-700">Share this campaign:</span>
         <button className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">WhatsApp</button>
@@ -106,7 +105,7 @@ export default function CampaignDetail() {
         </button>
       </div>
 
-      {/* 📢 Campaign Updates */}
+     
       <div className="mt-10">
         <h3 className="text-xl font-semibold mb-3 text-blue-800">Campaign Updates</h3>
 
@@ -143,7 +142,7 @@ export default function CampaignDetail() {
         )}
       </div>
 
-      {/* 💬 Comments */}
+      
       <div className="mt-10">
         <h3 className="text-xl font-semibold mb-3 text-blue-800">Comments</h3>
 

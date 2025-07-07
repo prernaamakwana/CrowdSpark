@@ -13,13 +13,12 @@ export default function Login() {
       const res = await axios.post(
         'http://localhost:5000/api/auth/login',
         { email, password },
-        { withCredentials: true } // ✅ allows cookie or session-based auth
+        { withCredentials: true } 
       );
 
       if (res.data?.user) {
         localStorage.setItem('user', JSON.stringify(res.data.user));
 
-        // Optional: store token if backend sends it
         if (res.data.token) {
           localStorage.setItem('token', res.data.token);
         }

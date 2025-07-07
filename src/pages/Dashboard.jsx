@@ -3,11 +3,11 @@ import axios from 'axios';
 
 export default function Dashboard() {
   const [campaigns, setCampaigns] = useState([]);
-  const [user, setUser] = useState(null); // To check user ID
-  const role = 'owner'; // Optional: Set from auth if role-based logic is needed
+  const [user, setUser] = useState(null); 
+  const role = 'owner'; 
 
   useEffect(() => {
-    // Get user from localStorage
+    
     const storedUser = JSON.parse(localStorage.getItem("user"));
     setUser(storedUser);
 
@@ -23,9 +23,8 @@ export default function Dashboard() {
     fetchCampaigns();
   }, []);
 
-  // Filter campaigns if user is owner
   const myCampaigns = campaigns.filter(
-    (c) => c.createdBy === user?.id // only show user's own campaigns
+    (c) => c.createdBy === user?.id 
   );
 
   return (

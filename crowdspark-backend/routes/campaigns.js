@@ -1,24 +1,23 @@
-// routes/campaigns.js
 const express = require('express');
 const router = express.Router();
 const Campaign = require('../models/campaign');
 
-// routes/campaigns.js
+
 router.post('/', async (req, res) => {
   try {
-    const { title, description, goal, category } = req.body;
+    const { title, description, goal, category, endDate } = req.body;
 
     if (!category) {
       return res.status(400).json({ message: 'Category is required' });
     }
 
-    const campaign = new Campaign({ title, description, goal, category });
+    const campaign = new Campaign({ title, description, goal, category, endDate });
     await campaign.save();
 
-    res.status(201).json({ message: 'Campaign created successfully', campaign }); // ✅ success response
+    res.status(201).json({ message: 'Campaign created successfully', campaign }); 
   } catch (err) {
     console.error("Create Campaign Error:", err);
-    res.status(500).json({ message: "Failed to create campaign" }); // ❌ error
+    res.status(500).json({ message: "Failed to create campaign" }); 
   }
 });
 
@@ -32,7 +31,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get single campaign
+
 router.get('/:id', async (req, res) => {
   try {
     const campaign = await Campaign.findById(req.params.id);
@@ -40,6 +39,18 @@ router.get('/:id', async (req, res) => {
     res.json(campaign);
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
+  }
+});
+router.delete('/:id', async (req, res) => {
+  try {
+    const deleted = await Campaign.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ message: 'Campaign not found' });
+    }
+    res.status(200).json({ message: 'Campaign deleted successfully' });
+  } catch (err) {
+    console.error('Delete error:', err);
+    res.status(500).json({ message: 'Failed to delete campaign' });
   }
 });
 
