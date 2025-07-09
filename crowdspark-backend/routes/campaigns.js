@@ -54,4 +54,20 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+router.get("/bookmarked", async (req, res) => {
+  try {
+    const ids = req.query.ids?.split(",") || [];
+    if (!ids.length) {
+      return res.status(400).json({ message: "No campaign IDs provided" });
+    }
+
+    const campaigns = await Campaign.find({ _id: { $in: ids } });
+    res.status(200).json(campaigns);
+  } catch (err) {
+    console.error("Error fetching bookmarked campaigns:", err);
+    res.status(500).json({ message: "Failed to fetch bookmarked campaigns" });
+  }
+});
+
+
 module.exports = router;

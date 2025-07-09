@@ -1,74 +1,108 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { toast } from "react-hot-toast";
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+
+    if (!trimmedEmail || !trimmedPassword) {
+      toast.error("Please enter both email and password.");
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      const res = await axios.post(
-        'http://localhost:5000/api/auth/login',
-        { email, password },
-        { withCredentials: true } 
-      );
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: trimmedEmail, password: trimmedPassword }),
+        // credentials: "include", // Uncomment if using cookie-based auth
+      });
 
-      if (res.data?.user) {
-        localStorage.setItem('user', JSON.stringify(res.data.user));
+      const data = await response.json();
 
-        if (res.data.token) {
-          localStorage.setItem('token', res.data.token);
-        }
+      if (response.ok) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("role", data.user.role);
+        localStorage.setItem("user", JSON.stringify(data.user));
 
-        alert('Login successful');
-        navigate('/dashboard');
+        toast.success("Login successful!");
+
+        navigate(data.user.role === "admin" ? "/admin" : "/explore");
       } else {
-        alert('Login failed: Invalid response from server');
+        toast.error(data.message || "Login failed. Please try again.");
       }
-    } catch (err) {
-      console.error("Login Error:", err);
-      alert('Login failed: ' + (err.response?.data?.message || 'Server error'));
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Server error. Please try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#BDDDE4] via-[#FFF1D5] to-[#9EC6F3]">
-      <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-md">
-        <h2 className="text-3xl font-bold mb-6 text-center text-blue-900">Login to CrowdSpark</h2>
-        <form onSubmit={handleLogin} className="space-y-4">
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            required
-          />
-          <button
-            type="submit"
-            className="w-full bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition"
+    <div className="min-h-screen flex items-center justify-center bg-[#E0F2FE] px-4">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full"
+      >
+        <h2 className="text-3xl font-bold text-blue-800 mb-6 text-center">Login</h2>
+
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          placeholder="Email"
+          className="w-full mb-4 px-4 py-2 border rounded"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+
+        <input
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          placeholder="Password"
+          className="w-full mb-6 px-4 py-2 border rounded"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+
+        <button
+          disabled={loading}
+          className={`w-full py-2 rounded text-white font-semibold transition duration-200 ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
+        >
+          {loading ? "Logging in..." : "Log In"}
+        </button>
+
+        <p className="mt-4 text-center text-sm">
+          Don’t have an account?{" "}
+          <span
+            onClick={() => navigate("/register")}
+            className="text-blue-600 cursor-pointer underline"
           >
-            Login
-          </button>
-        </form>
-        <p className="text-center mt-4 text-sm text-gray-600">
-          Don’t have an account?{' '}
-          <Link to="/register" className="text-blue-700 hover:underline">
-            Sign Up
-          </Link>
+            Register here
+          </span>
         </p>
-      </div>
+      </form>
     </div>
   );
 }

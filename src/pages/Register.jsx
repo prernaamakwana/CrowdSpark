@@ -1,71 +1,123 @@
-import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { toast } from "react-hot-toast";
 
 export default function Register() {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
+    if (!email.trim() || !name.trim() || !password.trim()) {
+      toast.error("All fields are required.");
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long.");
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", {
-        username,
-        email,
-        password,
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          password: password.trim(),
+        }),
       });
-      alert("Registered successfully!");
-      navigate("/login");
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("role", data.user.role);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        setName("");
+        setEmail("");
+        setPassword("");
+
+        toast.success("Account created!");
+        navigate("/dashboard");
+      } else {
+        toast.error(data.message || "Registration failed. Try again.");
+      }
     } catch (err) {
-      alert(err.response?.data?.message || "Registration failed");
+      console.error("Registration error:", err);
+      toast.error("Server error. Please try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#BDDDE4] via-[#FFF1D5] to-[#9EC6F3]">
-      <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-md">
-        <h2 className="text-3xl font-bold mb-6 text-center text-blue-900">Create an Account</h2>
-        <form onSubmit={handleRegister} className="space-y-4">
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
-            className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            required
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            required
-          />
-          <button
-            type="submit"
-            className="w-full bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition"
+    <div className="min-h-screen flex items-center justify-center bg-[#FFFDE7] px-4">
+      <form
+        onSubmit={handleRegister}
+        className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full"
+      >
+        <h2 className="text-3xl font-bold text-blue-800 mb-6 text-center">
+          Register
+        </h2>
+
+        <input
+          type="text"
+          placeholder="Full Name"
+          className="w-full mb-4 px-4 py-2 border rounded"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+
+        <input
+          type="email"
+          placeholder="Email"
+          className="w-full mb-4 px-4 py-2 border rounded"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          className="w-full mb-6 px-4 py-2 border rounded"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+
+        <button
+          type="submit"
+          disabled={loading}
+          className={`w-full py-2 rounded text-white font-semibold transition duration-200 ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-yellow-600 hover:bg-yellow-700"
+          }`}
+        >
+          {loading ? "Creating..." : "Create Account"}
+        </button>
+
+        <p className="mt-4 text-center text-sm">
+          Already have an account?{" "}
+          <span
+            onClick={() => navigate("/login")}
+            className="text-blue-600 cursor-pointer underline"
           >
-            Sign Up
-          </button>
-        </form>
-        <p className="text-center mt-4 text-sm text-gray-600">
-          Already have an account?{' '}
-          <a href="/login" className="text-blue-700 hover:underline">
             Login
-          </a>
+          </span>
         </p>
-      </div>
+      </form>
     </div>
   );
 }
